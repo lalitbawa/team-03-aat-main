@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="card-header">
+    <h1 class="fs-3">Delete this question?</h1>
+</div>
+<div class="card-body">
+<p>Are you sure you want to delete the question "{{ question.question }}"?</p>
+<form method="post">
+    <div>
+        <button type="submit" class="btn btn-primary me-2">Delete</button>
+        <a href="{{ url_for('view_all_questions') }}" class="btn btn-outline-primary">Back</a>
+    </div>
+</div>
+
+</form>
+{% endblock content %}

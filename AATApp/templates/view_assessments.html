@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="card-header">
+    <h1 class="fs-3">All Assessments</h1>
+</div>
+
+<div class="card-body">
+    <div class="list-group">
+        {% for assessment_dict in assessments %}
+        <li class="list-group-item">
+            <h3 class="fs-5"><a href="/assessment/{{ assessment_dict.assessment.id }}">{{ assessment_dict.assessment.title }}</a>
+                {% if assessment_dict.assessment.is_summative %}
+                    (summative)
+                {% else %}
+                    (formative)
+                {% endif %}
+            </h3>
+            <p>{{ assessment_dict.assessment.description }}</p>
+            {% if current_user.is_admin %}
+            <span class="btn-group my-1" role="group">
+                <a href="/assessment/{{ assessment_dict.assessment.id }}" class="btn btn-outline-dark">View</a>
+                <a href="/assessment/edit/{{ assessment_dict.assessment.id }}"
+                    class="btn btn-outline-dark">Edit</a>
+                <a href="/assessment/delete/{{ assessment_dict.assessment.id }}"
+                    class="btn btn-outline-danger">Delete</a>
+            </span>
+            {% else %}
+                <div class="card">
+                    <h5 class="card-header">Submissions</h4>
+                    <div class="card-body">
+                        {% if assessment_dict.attempts == 0 %}
+                            <p>You have not yet attempted this assessment.</p>
+                        {% else %}
+                            {% if assessment_dict.assessment.is_summative %}
+                                <a href="/results/{{ assessment_dict.assessment.id }}/1">View Results</a>
+                            {% else %}
+                                <ul class="list-group">
+                                    {% for n in range(assessment_dict.attempts) %}
+                                        <li class="list-group-item">
+                                            <a href="/results/{{ assessment_dict.assessment.id }}/{{ n + 1 }}">View Results for Attempt {{ n + 1 }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </div>
+    {% if current_user.is_admin %}
+    <a href="{{ url_for('add_assessment') }}" class="btn btn-outline-dark my-3">Create New Assessment</a>
+    {% endif %}
+</div>
+
+{% endblock content %}

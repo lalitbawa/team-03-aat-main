@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="card-header">
+  <h1>{{ assessment.title }} Results - {{ ((score / questions|length) * 100)|round(2) }}%</h1>
+</div>
+<div class="card-item p-3">
+  <h2>{{ assessment.description }}</h2>
+  {% if not assessment.is_summative %}
+    <p>Results from Attempt Number {{ attempt }}</p>
+  {% endif %}
+  <ul class="list-group mx-3" style="width: 97%">
+    <form method="post">
+      {% for question in questions %}
+      <div class="list-group-item">
+        <h3>Question {{ loop.index }}: {{question.question}}</h3>
+        {% if question.is_multiple_choice %}
+          {% set result = question.id ~ 'result' %}
+          {% set form = 'mq' ~ question.id %}
+          
+          {% if mqforms[result] == question.answer %}
+            <h4>Result: Correct</h4>
+          {% else %}
+            <h4>Result: Incorrect</h4>
+            {{ mqforms[form].csrf_token }}
+            <p><span class="fw-bold">Correct Answer</span>: 
+              {% if question.answer == 'choice1' %}
+                  {{ question.choice1 }}
+              {% elif question.answer == 'choice2' %}
+                  {{ question.choice2 }}
+              {% elif question.answer == 'choice3' %}
+                  {{ question.choice3 }}
+              {% else %}
+                  {{ question.choice4 }}
+              {% endif %}
+            </p>
+          {% endif %}
+          <p><span class="fw-bold">Your Answer</span>:
+            {% if mqforms[result] == 'choice1' %}
+              {{ question.choice1 }}
+            {% elif mqforms[result] == 'choice2' %}
+              {{ question.choice2 }}
+            {% elif mqforms[result] == 'choice3' %}
+              {{ question.choice3 }}
+            {% else %}
+              {{ question.choice4 }}
+            {% endif %}
+          </p>
+
+
+
+        {% else %}
+          {% set result = question.id ~ 'result' %}
+          {% set form = 'sa' ~ question.id %}
+          {% if saforms[result] == question.answer %}
+            <h4>Result: Correct</h4>
+          {% else %}
+            <h4>Result: Incorrect</h4>
+            <p><span class="fw-bold">Correct Answer</span>: {{ question.answer }}</p>
+          {% endif %}
+              <p><span class="fw-bold">Your Answer</span>: {{ saforms[result] }}</p>
+
+        {% endif %}
+        <p><span class="fw-bold">Feedback</span>: {{question.feedback}}</p>
+      </div>
+      {% endfor %}
+    </form>
+    <h2>Total Score: {{ score }} / {{ questions|length }} ({{ ((score / questions|length) * 100)|round(2) }}%)</h2>
+    {% if not assessment.is_summative %}
+      <a href="/assessment/{{ assessment.id }}" class="btn btn-primary">Retake Assessment</a>
+    {% endif %}
+  </ul>
+</div>
+{% endblock content %}

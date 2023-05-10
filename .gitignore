@@ -1,0 +1,5 @@
+*.pyc
+venv
+x*
+.DS_Store
+logs*

@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="card-header">
+    <h1 class="fs-3">Welcome to the AAT!</h1>
+</div>
+
+<div class="card-body">
+    <h2 class="fs-4">Assessments</h2>
+    <ul class="list-group">
+        {% for assessment in assessments %}
+        <li class="list-group-item py-0.1">
+            <h3 class="fs-5"><a href="/assessment/{{ assessment.id }}">{{ assessment.title }}</a></h3>
+            <p class="my-0">{{ assessment.description }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock content %}

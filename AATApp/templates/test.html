@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="card-header">
+  <h1 class="fs-3">View Assessment</h1>
+</div>
+
+<div class=card-body">
+  <div class="list-group m-2">
+    {% for question in questions %}
+
+    <div class="list-group-item">
+      <h1 class="fs-4 mb-1">Question: {{question.question}}</h1>
+
+      {% if question.is_multiple_choice %}
+      {% set form = 'mq' ~ question.id %}
+
+      <form method="post">
+        {{ forms[form].csrf_token }}
+        {{ forms[form].form_choices.label }}
+        {% set myarr = [question.choice1, question.choice2, question.choice3, question.choice4] %}
+        {% for choice in forms[form].form_choices %}
+        <div>{{ choice (class="form-check-input") }} {{ myarr[loop.index - 1] }}</div>
+        {% endfor %}
+      </form>
+
+      {% else %}
+      {% set form = 'sa' ~ question.id %}
+
+      <form method="post">
+        {{ forms[form].csrf_token }}
+        <div class="form-group row me-2 mb-1">
+          <div class="col-sm-1">{{ forms[form].answer.label }}</div>
+          <div class="col-sm-9">{{ forms[form].answer (class="form-control")}}</div>
+        </div>
+      </form>
+      {% endif %}
+    </div>
+    {% endfor %}
+
+  </div>
+  <p>
+    <input type="submit" class="btn btn-primary ms-2"></input>
+  </p>
+</div>
+{% endblock content %}

@@ -1,0 +1,14 @@
+body {
+  font-family: helvetica, sans-serif;
+  background-color: #fff;
+  color: #002699;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+.form-group {
+  display: flex;
+  align-items: center;
+}

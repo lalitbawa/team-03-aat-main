@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="card-header">
+  <h1 class="fs-3">Welcome to the AAT!
+  </h1>
+  <h5>Here you can view how other students are doing in the assessments that you have. If you find any chart empty, it might be because no one have took that assessment yet.</h5>
+  <p style="color: red
+  ;">Please note that you cannot view which students have scored how many marks specifically to keep the information confidential</p>
+</div>
+
+<head>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+      let myarray = {{results|tojson}}
+  
+      function calculateAssessmentMarks(data) {
+        const result = {};
+        for (const student in data) {
+          for (const assessment in data[student]) {
+            if (!(assessment in result)) {
+              result[assessment] = { totalMarks: data[student][assessment]["1"].total };
+              result[assessment].marksAchieved = [];
+            }
+            const marks = data[student][assessment];
+            for (const question in marks) {
+              result[assessment].marksAchieved.push(marks[question].correct);
+            }
+          }
+        }
+        for (const assessment in result) {
+          result[assessment].marksAchieved.sort((a, b) => a - b);
+        }
+        return result;
+      }
+  
+      const assessments = calculateAssessmentMarks(myarray);
+      
+      for (const assessment in assessments) {
+        const marksAchieved = assessments[assessment].marksAchieved;
+        const totalMarks = assessments[assessment].totalMarks;
+        
+        const bins = [0, 0, 0, 0, 0, 0];
+        marksAchieved.forEach((mark) => {
+          const binIndex = Math.floor((mark / totalMarks) * 5);
+          bins[binIndex]++;
+        });
+  
+        const yArray = bins.reduce((acc, curr) => {
+          acc.push(curr);
+          return acc;
+        }, []);
+    
+        const xArray = ["0-20%", "20-40%", "40-60%", "60-80%", "80-100%"];
+    
+        const chartDiv = document.createElement("div");
+        chartDiv.id = assessment;
+        chartDiv.style.width = "100%";
+        chartDiv.style.maxWidth = "700px";
+    
+        document.body.appendChild(chartDiv);
+    
+        const layout = {
+          title: assessment,
+          xaxis: { title: 'Marks range' },
+          yaxis: { title: 'Number of students' }
+        };
+        const data = [{x:xArray, y:yArray, type:"bar"}];
+        Plotly.newPlot(assessment, data, layout);
+      }
+  
+    </script>
+</head>
+  
+</body>
+
+{% endblock  %}

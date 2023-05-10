@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="card-header">
+  <h1>{{ assessment.title }}</h1>
+</div>
+<div class="card-item p-3">
+  <p>{{ assessment.description }}</p>
+  <ul class="list-group mx-3" style="width: 97%">
+    <form method="post">
+      {% for question in questions %}
+      <div class="list-group-item">
+        <h2>Question: {{question.question}}</h2>
+        {% if question.is_multiple_choice %}
+
+          {% set form = 'mq' ~ question.id %}
+            {{ mqforms[form].csrf_token }}
+            {% if current_user.is_student %}
+              {{ mqforms[form].form_choices.label }}
+              {% set myarr = [question.choice1, question.choice2, question.choice3, question.choice4] %}
+              
+              {% for choice in mqforms[form].form_choices %}
+                <p>{{ choice }} {{ myarr[loop.index - 1] }}</p>
+              {% endfor %}
+            {% elif current_user.is_admin %}
+              {% if question.answer == 'choice1' %}
+              <p>Answer: {{ question.choice1 }}</p>
+              {% elif question.answer == 'choice2' %}
+              <p>Answer: {{ question.choice2 }}</p>
+              {% elif question.answer == 'choice3' %}
+              <p>Answer: {{ question.choice3 }}</p>
+              {% else %}
+              <p>Answer: {{ question.choice4 }}</p>
+              {% endif %}
+            {% endif %}
+
+        {% else %}
+
+          {% set form = 'sa' ~ question.id %}
+            {{ saforms[form].csrf_token }}
+            {% if current_user.is_student %}
+              {{ saforms[form].answer.label }} {{ saforms[form].answer }}
+            {% elif current_user.is_admin %}
+              <p>Answer: {{ question.answer }}</p>
+            {% endif %}
+
+        {% endif %}
+      </div>
+      {% endfor %}
+      {% if current_user.is_student %}
+        {{ last_form.submit (class="btn btn-primary")}}
+      {% elif current_user.is_admin %}
+        <div class="my-2">
+          <a href="/assessment/edit/{{ assessment.id }}" class="btn btn-primary">Edit Assessment</a>
+          <a href="/assessment/delete/{{ assessment.id }}" class="btn btn-danger">Delete Assessment</a>  
+        </div>
+      {% endif %}
+    </form>
+  </ul>
+</div>
+{% endblock content %}
